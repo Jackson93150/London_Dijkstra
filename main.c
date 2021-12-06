@@ -8,7 +8,7 @@ struct noeud {
   int num;
   int nbs;
   struct noeud * * succ;
-  float * poids;
+  int * poids;
 };
 
 typedef struct noeud noeud;
@@ -69,17 +69,32 @@ void stockcsv(){
   fclose(fp);
 }
 
-ptnoeud creenoeud (int nb) {
+ptnoeud creenoeud (int x) {
   ptnoeud t;
+  int suc = 0;
   t = (ptnoeud) malloc (sizeof(noeud));
   assert(t);
-  t->num = nb;
-  t->nbs = nb + 4;
+  int n = atol(values[x].st1);
+  t->num = n;
+  while(values[x].st1 == values[x+1].st1){
+    x++;
+  }
+  if(x != 0){
+    for(int i = 0; i <= x ; i++){
+      int snb = atol(values[x+i].st2);
+      t->succ[i] = (ptnoeud)snb;
+    }
+    int p = atol(values[x].time);
+    t->poids = &p;
+  }
+  t->nbs = x;
   return t;
 }
 
 int main(){
   stockcsv();
-  printf("%s\n",values[0].st1);
+  ptnoeud t[1];
+  t[0] = creenoeud(0);
+  printf("%d\n",t[0]->num);
   return 0;
 }
