@@ -24,8 +24,6 @@ struct lesnoeuds {
 };
 typedef struct lesnoeuds legraphe [MAX];
 
-int NodeVec[MAX];
-
 struct csv{
   char st1[MAX];
   char st2[MAX];
@@ -34,6 +32,8 @@ struct csv{
 };
 typedef struct csv dict;
 dict values[MAX];
+
+int position[303][MAXSUC];
 
 void stockcsv(){
   FILE *fp = fopen("london.connections.csv", "r");
@@ -76,13 +76,13 @@ void stockcsv(){
 ptnoeud creenoeud (int x) {
   ptnoeud t;
   int suc = 0;
-  int position[MAXSUC];
   t = (ptnoeud) malloc (sizeof(noeud));
   assert(t);
   t->num = x;
   for(int i = 0 ; i < 407;i++){
     if(x == atol(values[i].st1)){
-      position[suc] = i;
+      int tmp = atol(values[i].st2);
+      position[x-1][suc] = tmp-1;
       suc++;
     }
   }
@@ -90,7 +90,7 @@ ptnoeud creenoeud (int x) {
   if(suc != 0){
     for(int i = 0; i <= suc ; i++){
       t->succ[i] = (ptnoeud)0;
-      int p = atol(values[position[i]].time);
+      int p = atol(values[position[x-1][i]].time);
       t->poids[i] = p;
     }
   }
@@ -107,13 +107,21 @@ ptnoeud creeptnoeud () {
   for (i = 1; i < 303; i++) {
 	  t[i-1] = creenoeud(i);
   }
-  return t[0];
+  for(i = 1; i < 303; i++) {
+    if(t[i-1]->nbs != 0){
+      for(int j = 0 ; j <= t[i-1]->nbs;j++){
+        int tmp = position[i-1][j];
+        t[i-1]->succ[j] = t[tmp];
+      }
+    }
+  }
+  return t[10];
 }
 
 int main(){
   stockcsv();
   ptnoeud x;
   x = creeptnoeud();
-  printf("%d\n",x->poids[0]);
+  printf("%d\n",x->succ[5]->num);
   return 0;
 }
