@@ -2,13 +2,17 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdint.h>
+#include <inttypes.h>
+#include <unistd.h>
 #define MAX 1000
+#define MAXSUC 20
 
 struct noeud {
   int num;
   int nbs;
-  struct noeud * * succ;
-  int * poids;
+  int poids[MAXSUC];
+  struct noeud * succ[MAXSUC];
 };
 
 typedef struct noeud noeud;
@@ -72,29 +76,44 @@ void stockcsv(){
 ptnoeud creenoeud (int x) {
   ptnoeud t;
   int suc = 0;
+  int position[MAXSUC];
   t = (ptnoeud) malloc (sizeof(noeud));
   assert(t);
-  int n = atol(values[x].st1);
-  t->num = n;
-  while(values[x].st1 == values[x+1].st1){
-    x++;
-  }
-  if(x != 0){
-    for(int i = 0; i <= x ; i++){
-      int snb = atol(values[x+i].st2);
-      t->succ[i] = (ptnoeud)snb;
+  t->num = x;
+  for(int i = 0 ; i < 407;i++){
+    if(x == atol(values[i].st1)){
+      position[suc] = i;
+      suc++;
     }
-    int p = atol(values[x].time);
-    t->poids = &p;
   }
-  t->nbs = x;
+  t->nbs = suc;
+  if(suc != 0){
+    for(int i = 0; i <= suc ; i++){
+      t->succ[i] = (ptnoeud)0;
+      int p = atol(values[position[i]].time);
+      t->poids[i] = p;
+    }
+  }
+  if(suc == 0){
+    t->succ[0] = (ptnoeud)0;
+    t->poids[0] = 0;
+  }
   return t;
+}
+
+ptnoeud creeptnoeud () {
+  ptnoeud t[303];
+  int i;
+  for (i = 1; i < 303; i++) {
+	  t[i-1] = creenoeud(i);
+  }
+  return t[0];
 }
 
 int main(){
   stockcsv();
-  ptnoeud t[1];
-  t[0] = creenoeud(0);
-  printf("%d\n",t[0]->num);
+  ptnoeud x;
+  x = creeptnoeud();
+  printf("%d\n",x->poids[0]);
   return 0;
 }
