@@ -86,6 +86,15 @@ ptnoeud creenoeud (int x) {
       suc++;
     }
   }
+  if(suc == 0){
+    for(int i = 0 ; i < 407;i++){
+      if(x == atol(values[i].st2)){
+        int tmp = atol(values[i].st1);
+        position[x-1][suc] = tmp-1;
+        suc++;
+      }
+    }
+  }
   t->nbs = suc;
   if(suc != 0){
     for(int i = 0; i <= suc ; i++){
@@ -101,7 +110,7 @@ ptnoeud creenoeud (int x) {
   return t;
 }
 
-ptnoeud creeptnoeud () {
+ptnoeud creeptnoeud (int x) {
   ptnoeud t[303];
   int i;
   for (i = 1; i < 303; i++) {
@@ -115,13 +124,18 @@ ptnoeud creeptnoeud () {
       }
     }
   }
-  return t[10];
+  return t[x];
 }
 
 int main(){
   stockcsv();
   ptnoeud x;
-  x = creeptnoeud();
-  printf("%d\n",x->succ[5]->num);
+  x = creeptnoeud(10);
+  legraphe z[303];
+  for(int i = 1 ; i < 303 ; i++){
+    z[i-1]->vu = 0;
+    z[i-1]->ne = creeptnoeud(i-1);
+  }
+  printf("%d\n",z[301]->ne->succ[0]->num);
   return 0;
 }
