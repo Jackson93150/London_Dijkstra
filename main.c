@@ -5,8 +5,8 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <unistd.h>
-#define MAX 1000
-#define MAXSUC 20
+#define MAX 1500
+#define MAXSUC 1000
 
 struct noeud
 {
@@ -262,6 +262,7 @@ void Dijkstra(int Depart, int Destination){
   int pds;
   int compteur = 0;
   int chemin[100];
+  int poidf = Destination;
   for (int i = 0; i < 303; i++){
     poids[i] = -1;
     if (i == Depart-1){
@@ -305,7 +306,7 @@ void Dijkstra(int Depart, int Destination){
   for(int j = 0; j < compteur;j++){
     printf("%s -> ",NomStation[chemin[j]-1].st4);
   }
-  printf("Temps estimé : %d minutes \n",poids[chemin[compteur-1]]);
+  printf("Temps estimé : %d minutes \n",poids[poidf-1]);
   //printf("%s",NomStation[0]);
 }
 
@@ -313,6 +314,6 @@ void Dijkstra(int Depart, int Destination){
 int main(){
   stockcsv();
   stockcsv2();
-  Dijkstra(82,66);
+  Dijkstra(164,82);
   return 0;
 }
