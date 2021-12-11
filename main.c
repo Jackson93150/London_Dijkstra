@@ -83,7 +83,7 @@ legraphe line[303];
 legraphe2 line2[303];
 int poids[303];
 
-void stockcsv2()
+void stockcsv2() // stockage des donnes des ficher csv
 {
   FILE *fp = fopen("stations.csv", "r");
   if (!fp)
@@ -145,7 +145,7 @@ void stockcsv2()
   fclose(fp);
 }
 
-void stockcsv()
+void stockcsv() // la meme mais sur un autre fichier
 {
   FILE *fp = fopen("london.connections.csv", "r");
   if (!fp)
@@ -193,7 +193,7 @@ void stockcsv()
 }
 
 ptnoeud2 t2[303];
-ptarete creerarrete(int x , int suc,int z){
+ptarete creerarrete(int x , int suc,int z){ // creation de l'arrete pour les list 
   ptarete t;
   t = (ptarete)malloc(sizeof(noeud2));
   assert(t);
@@ -207,7 +207,7 @@ ptarete creerarrete(int x , int suc,int z){
   return t;
 }
 
-ptnoeud2 creenoeud2(int x){
+ptnoeud2 creenoeud2(int x){ // creation du node pour les list
   ptnoeud2 t;
   t = (ptnoeud2)malloc(sizeof(noeud2));
   assert(t);
@@ -233,7 +233,7 @@ ptnoeud2 creenoeud2(int x){
   return t;
 }
 
-ptnoeud2 creeptnoeud2(){
+ptnoeud2 creeptnoeud2(){ // creaation de tous les nodes des liste
   int i ;
   for (i = 0; i < 303; i++){
     t2[i] = creenoeud2(i+1);
@@ -248,7 +248,7 @@ ptnoeud2 creeptnoeud2(){
   }
 }
 
-ptnoeud creenoeud(int x)
+ptnoeud creenoeud(int x) // creation du node pour les vec
 {
   ptnoeud t;
   int suc = 0;
@@ -289,7 +289,7 @@ ptnoeud creenoeud(int x)
 }
 
 ptnoeud t[303];
-ptnoeud creeptnoeud()
+ptnoeud creeptnoeud() // creation de tous les nodes pour les vec
 {
   int i;
   for (i = 0; i < 303; i++){
@@ -305,7 +305,7 @@ ptnoeud creeptnoeud()
   }
 }
 
-int minPoids(){
+int minPoids(){ // recherche du poid minimum
   int temp = MAX;
   int mini = -1;
   for (int i = 0; i < 303; i++){
@@ -321,7 +321,7 @@ int minPoids(){
   return mini;
 }
 
-int minPoids2(){
+int minPoids2(){ // recherche du poid minimum pour les list
   int temp = MAX;
   int mini = -1;
   for (int i = 0; i < 303; i++){
@@ -337,7 +337,7 @@ int minPoids2(){
   return mini;
 }
 
-void reverse(int arr[], int n)
+void reverse(int arr[], int n) // fonction pour reverse un vec
 {
     int aux[n];
  
@@ -350,9 +350,9 @@ void reverse(int arr[], int n)
     }
 }
 
-void Dijkstra2(int Depart, int Destination){
+void Dijkstra2(int Depart, int Destination){// Dijkstra pour les list
   creeptnoeud2();
-  for (int i = 0; i < 303; i++){
+  for (int i = 0; i < 303; i++){ // on stock tous les node creer dans le vecteur de node
     line2[i]->vu = 0;
     line2[i]->ne = t2[i];
   }
@@ -364,35 +364,35 @@ void Dijkstra2(int Depart, int Destination){
   int compteur = 0;
   int chemin[100];
   int poidf = Destination;
-  for (int i = 0; i < 303; i++){
+  for (int i = 0; i < 303; i++){ // initialistion des poids a -1 sauf pour le poids de depart 
     poids[i] = -1;
     if (i == Depart-1){
       poids[i] = 0;
     }
   }
   while(minline != Destination-1){
-    minline = minPoids2();
+    minline = minPoids2(); // on prend l'id du poids min 
     ptarete n = line2[minline]->ne->next;
-    for(int i = 0 ; i < line2[minline]->ne->nbs ;i++){
+    for(int i = 0 ; i < line2[minline]->ne->nbs ;i++){ // on parcour tous les succ de ce node 
       nb = n->pt->num;
-      pds = n->poids;
-      if(poids[nb-1] >= pds){
-        poids[nb-1] = pds;
-        antecedent[nb-1] = line[minline]->ne->num;
-      }
-      if(poids[nb-1] <= 0){
-        poids[nb-1] = pds;
-        antecedent[nb-1] = line[minline]->ne->num;
-      }
+      pds = poids[minline]+n->poids;
+        if(poids[nb-1] > pds){ // si le parcours et moins lourd en poids en remplace et le node devient l'antecedent
+          poids[nb-1] = pds;
+          antecedent[nb-1] = line2[minline]->ne->num;
+        }
+        if(poids[nb-1] <= 0){ // si il n'a pas encore ete parcouru le node devient l'antecedent et il prend le poids du trajet
+          poids[nb-1] = pds;
+          antecedent[nb-1] = line2[minline]->ne->num;
+        }
       n = n->suiv;
     }
-    line[minline]->vu = 1;
+    line2[minline]->vu = 1;
     distance++;
-    if(distance == 500){
+    if(distance == 500){ // si il y'a un probleme pour ne pas qu'il boucle à l'inifini
       minline = Destination-1;
     }
   }
-  while(Destination != Depart){
+  while(Destination != Depart){ // recherche du chemin en prenant les antecedant et on va stocker dans un vec
     if(compteur == 0){
         chemin[compteur] = Destination;
         compteur++;
@@ -404,16 +404,16 @@ void Dijkstra2(int Depart, int Destination){
     }
   }
   chemin[compteur] = antecedent[Destination-1];
-  reverse(chemin,compteur);
+  reverse(chemin,compteur); // on rever le vec pour pouvoir print le chemin
   for(int j = 0; j < compteur;j++){
     printf("%s -> ",NomStation[chemin[j]-1].st4);
   }
   printf("Temps estimé : %d minutes \n",poids[poidf-1]);
 }
 
-void Dijkstra(int Depart, int Destination){
+void Dijkstra(int Depart, int Destination){ // meme principe qu'en haut mais pour les vec
   creeptnoeud();
-  for (int i = 0; i < 303; i++){
+  for (int i = 0; i < 303; i++){ 
     line[i]->vu = 0;
     line[i]->ne = t[i];
   }
@@ -433,7 +433,6 @@ void Dijkstra(int Depart, int Destination){
   }
   while(minline != Destination-1){
     minline = minPoids();
-    //printf("%d,%d,%d\n",line[minline]->ne->num,line[minline]->ne->nbs,poids[minline]);
     for(int i = 0 ; i < line[minline]->ne->nbs ;i++){
       nb = line[minline]->ne->succ[i]->num;
       pds = poids[minline]+*line[minline]->ne->succ[i]->poids;
@@ -469,14 +468,55 @@ void Dijkstra(int Depart, int Destination){
     printf("%s -> ",NomStation[chemin[j]-1].st4);
   }
   printf("Temps estimé : %d minutes \n",poids[poidf-1]);
-  //printf("%s",NomStation[0]);
+}
+
+void lancer_recherche(){
+  stockcsv();
+  stockcsv2();
+  int Dijk;
+  int a;
+  int b;
+  int replay;
+  printf("Tapez 1 pour utilisez les 'vecteurs' et tapez 2 pour les 'listes'\n");
+  scanf("%d",&Dijk);
+  while(Dijk < 1 || Dijk > 2){
+    printf("Tapez 1 pour utilisez les 'vecteurs' et tapez 2 pour les 'listes'\n");
+    scanf("%d",&Dijk);
+  }
+  printf("Veuillez entrez l'ID de la station de Depart (Vous pouvez regardez le fichier london.lines pour voir la liste des stations)\n");
+  scanf("%d",&a);
+  while (a<0 || a>303){
+    printf("Choissisez une valeur entre 1 et 302 s'il vous plait\n");
+    scanf("%d",&a);
+  }
+  printf("Veuillez entrez l'ID de la station de d'Arrivée \n");
+  scanf("%d",&b);
+  while (b<0 || b>303){
+    printf("Choissisez une valeur entre 1 et 302 s'il vous plait\n");
+    scanf("%d",&b);
+  }
+  if(Dijk == 1){
+    Dijkstra(a,b);
+  }
+  if(Dijk == 2){
+    Dijkstra2(a,b);
+  }
+  printf("Voulez vous voir un autre trajet ?(1 : Oui / 2 : Non)\n");
+  scanf("%d",&replay);
+  while(replay < 1 || replay > 2){
+    printf("Je n'ai pas compris Tapez 1 ou 2 \n");
+    scanf("%d",&replay);
+  }
+  if(replay == 1){
+    lancer_recherche();
+  }
+  if(replay == 2){
+    exit;
+  }
 }
 
 
 int main(){
-  stockcsv();
-  stockcsv2();
-  Dijkstra2(12,23);
-  //printf("%d",t2[10]->next->suiv->pt->num);
+  lancer_recherche();
   return 0;
 }
