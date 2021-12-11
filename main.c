@@ -376,7 +376,7 @@ void Dijkstra2(int Depart, int Destination){// Dijkstra pour les list
     for(int i = 0 ; i < line2[minline]->ne->nbs ;i++){ // on parcour tous les succ de ce node 
       nb = n->pt->num;
       pds = poids[minline]+n->poids;
-        if(poids[nb-1] > pds){ // si le parcours et moins lourd en poids en remplace et le node devient l'antecedent
+        if(poids[nb-1] >= pds){ // si le parcours et moins lourd en poids en remplace et le node devient l'antecedent
           poids[nb-1] = pds;
           antecedent[nb-1] = line2[minline]->ne->num;
         }
