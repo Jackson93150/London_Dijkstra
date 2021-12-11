@@ -44,12 +44,15 @@ struct lesnoeuds2 {
 typedef struct lesnoeuds2 legraphe2 [MAX];
 
 struct aretes {
+  int pere;
   ptnoeud2 pt;
   int poids;
   struct aretes * suiv;
 } ;
 typedef struct aretes aretes;
 typedef struct aretes * ptarete;
+
+ptarete allarete [MAX];
 
 struct csv
 {
@@ -77,6 +80,7 @@ dict2 NomStation[303];
 
 int position[303][MAXSUC];
 legraphe line[303];
+legraphe2 line2[303];
 int poids[303];
 
 void stockcsv2()
@@ -194,6 +198,7 @@ ptarete creerarrete(int x , int suc,int z){
   t = (ptarete)malloc(sizeof(noeud2));
   assert(t);
   if(z < suc){
+    t->pere = x;
     t->pt = (ptnoeud2)0;
     int p = atol(values[position[x - 1][z]].time);
     t->poids = p;
@@ -233,8 +238,12 @@ ptnoeud2 creeptnoeud2(){
   for (i = 0; i < 303; i++){
     t2[i] = creenoeud2(i+1);
   }
-  for (i = 0; i < 303; i++){
-    if (t2[i]->nbs != 0){
+  for(i = 0; i < 303;i++){
+    ptarete a = t2[i]->next;
+    for(int j = 0 ; j < t2[i]->nbs ; j++){
+      int p = position[i][j];
+      a->pt = t2[p];
+      a = a->suiv;
     }
   }
 }
@@ -312,6 +321,22 @@ int minPoids(){
   return mini;
 }
 
+int minPoids2(){
+  int temp = MAX;
+  int mini = -1;
+  for (int i = 0; i < 303; i++){
+    if (poids[i] <= temp){
+      if (line2[i]->vu == 0){
+        if (poids[i] != -1){
+          mini = i;
+          temp = poids[i];
+        }
+      }
+    }
+  }
+  return mini;
+}
+
 void reverse(int arr[], int n)
 {
     int aux[n];
@@ -323,6 +348,67 @@ void reverse(int arr[], int n)
     for (int i = 0; i < n; i++) {
         arr[i] = aux[i];
     }
+}
+
+void Dijkstra2(int Depart, int Destination){
+  creeptnoeud2();
+  for (int i = 0; i < 303; i++){
+    line2[i]->vu = 0;
+    line2[i]->ne = t2[i];
+  }
+  int distance = 0;
+  int antecedent[303];
+  int minline = -1;
+  int nb;
+  int pds;
+  int compteur = 0;
+  int chemin[100];
+  int poidf = Destination;
+  for (int i = 0; i < 303; i++){
+    poids[i] = -1;
+    if (i == Depart-1){
+      poids[i] = 0;
+    }
+  }
+  while(minline != Destination-1){
+    minline = minPoids2();
+    ptarete n = line2[minline]->ne->next;
+    for(int i = 0 ; i < line2[minline]->ne->nbs ;i++){
+      nb = n->pt->num;
+      pds = n->poids;
+      if(poids[nb-1] >= pds){
+        poids[nb-1] = pds;
+        antecedent[nb-1] = line[minline]->ne->num;
+      }
+      if(poids[nb-1] <= 0){
+        poids[nb-1] = pds;
+        antecedent[nb-1] = line[minline]->ne->num;
+      }
+      n = n->suiv;
+    }
+    line[minline]->vu = 1;
+    distance++;
+    if(distance == 500){
+      minline = Destination-1;
+    }
+  }
+  while(Destination != Depart){
+    if(compteur == 0){
+        chemin[compteur] = Destination;
+        compteur++;
+    }
+    else{
+        chemin[compteur] = antecedent[Destination-1];
+        Destination = antecedent[Destination-1];
+        compteur++;
+    }
+  }
+  chemin[compteur] = antecedent[Destination-1];
+  reverse(chemin,compteur);
+  for(int j = 0; j < compteur;j++){
+    printf("%s -> ",NomStation[chemin[j]-1].st4);
+  }
+  printf("Temps estimé : %d minutes \n",poids[poidf-1]);
 }
 
 void Dijkstra(int Depart, int Destination){
@@ -390,8 +476,7 @@ void Dijkstra(int Depart, int Destination){
 int main(){
   stockcsv();
   stockcsv2();
-  Dijkstra(12,23);
-  creeptnoeud2();
-  printf("%d",t2[10]->next->pt->num);
+  Dijkstra2(12,23);
+  //printf("%d",t2[10]->next->suiv->pt->num);
   return 0;
 }
