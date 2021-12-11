@@ -45,7 +45,7 @@ typedef struct lesnoeuds2 legraphe2 [MAX];
 
 struct aretes {
   ptnoeud2 pt;
-  float poids;
+  int poids;
   struct aretes * suiv;
 } ;
 typedef struct aretes aretes;
@@ -188,14 +188,18 @@ void stockcsv()
   fclose(fp);
 }
 
-ptarete creerarrete(int x , int suc){
+ptnoeud2 t2[303];
+ptarete creerarrete(int x , int suc,int z){
   ptarete t;
-  for(int i = 0 ; i < suc ; i++){
+  t = (ptarete)malloc(sizeof(noeud2));
+  assert(t);
+  if(z < suc){
     t->pt = (ptnoeud2)0;
-    int p = atol(values[position[x - 1][i]].time);
+    int p = atol(values[position[x - 1][z]].time);
     t->poids = p;
-    t->suiv = (ptarete)0;
+    t->suiv = creerarrete(x,suc,z+1);
   }
+  return t;
 }
 
 ptnoeud2 creenoeud2(int x){
@@ -220,12 +224,19 @@ ptnoeud2 creenoeud2(int x){
     }
   }
   t->nbs = suc;
-  t->next = creerarrete(x,suc);
+  t->next = creerarrete(x,suc,0);
   return t;
 }
 
-ptnoeud2 creeptnoeud2(int x){
-
+ptnoeud2 creeptnoeud2(){
+  int i ;
+  for (i = 0; i < 303; i++){
+    t2[i] = creenoeud2(i+1);
+  }
+  for (i = 0; i < 303; i++){
+    if (t2[i]->nbs != 0){
+    }
+  }
 }
 
 ptnoeud creenoeud(int x)
@@ -380,5 +391,7 @@ int main(){
   stockcsv();
   stockcsv2();
   Dijkstra(12,23);
+  creeptnoeud2();
+  printf("%d",t2[10]->next->pt->num);
   return 0;
 }
