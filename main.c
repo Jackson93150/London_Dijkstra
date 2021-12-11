@@ -6,8 +6,9 @@
 #include <inttypes.h>
 #include <unistd.h>
 #define MAX 1500
-#define MAXSUC 1000
+#define MAXSUC 100
 
+//vecteur de succeseur
 struct noeud
 {
   int num;
@@ -25,6 +26,30 @@ struct lesnoeuds
   ptnoeud ne;
 };
 typedef struct lesnoeuds legraphe[MAX];
+
+// liste de succeseur
+
+struct noeud2 {
+  int num;
+  int nbs;
+  struct aretes * next;
+};
+typedef struct noeud2 noeud2;
+typedef struct noeud2 * ptnoeud2;
+
+struct lesnoeuds2 {
+  int vu;
+  ptnoeud2 ne;
+};
+typedef struct lesnoeuds2 legraphe2 [MAX];
+
+struct aretes {
+  ptnoeud2 pt;
+  float poids;
+  struct aretes * suiv;
+} ;
+typedef struct aretes aretes;
+typedef struct aretes * ptarete;
 
 struct csv
 {
@@ -163,6 +188,46 @@ void stockcsv()
   fclose(fp);
 }
 
+ptarete creerarrete(int x , int suc){
+  ptarete t;
+  for(int i = 0 ; i < suc ; i++){
+    t->pt = (ptnoeud2)0;
+    int p = atol(values[position[x - 1][i]].time);
+    t->poids = p;
+    t->suiv = (ptarete)0;
+  }
+}
+
+ptnoeud2 creenoeud2(int x){
+  ptnoeud2 t;
+  t = (ptnoeud2)malloc(sizeof(noeud2));
+  assert(t);
+  t->num = x;
+  int suc = 0;
+  for (int i = 0; i < 407; i++)
+  {
+    if (x == atol(values[i].st1))
+    {
+      int tmp = atol(values[i].st2);
+      position[x - 1][suc] = tmp - 1;
+      suc++;
+    }
+    if (x == atol(values[i].st2))
+    {
+      int tmp = atol(values[i].st1);
+      position[x - 1][suc] = tmp - 1;
+      suc++;
+    }
+  }
+  t->nbs = suc;
+  t->next = creerarrete(x,suc);
+  return t;
+}
+
+ptnoeud2 creeptnoeud2(int x){
+
+}
+
 ptnoeud creenoeud(int x)
 {
   ptnoeud t;
@@ -203,22 +268,21 @@ ptnoeud creenoeud(int x)
   return t;
 }
 
-ptnoeud creeptnoeud(int x)
+ptnoeud t[303];
+ptnoeud creeptnoeud()
 {
-  ptnoeud t[303];
   int i;
-  for (i = 1; i < 303; i++){
-    t[i - 1] = creenoeud(i);
+  for (i = 0; i < 303; i++){
+    t[i] = creenoeud(i+1);
   }
-  for (i = 1; i < 303; i++){
-    if (t[i - 1]->nbs != 0){
-      for (int j = 0; j <= t[i - 1]->nbs; j++){
-        int tmp = position[i - 1][j];
-        t[i - 1]->succ[j] = t[tmp];
+  for (i = 0; i < 303; i++){
+    if (t[i]->nbs != 0){
+      for (int j = 0; j <= t[i]->nbs; j++){
+        int tmp = position[i][j];
+        t[i]->succ[j] = t[tmp];
       }
     }
   }
-  return t[x];
 }
 
 int minPoids(){
@@ -251,9 +315,10 @@ void reverse(int arr[], int n)
 }
 
 void Dijkstra(int Depart, int Destination){
-  for (int i = 1; i < 303; i++){
-    line[i - 1]->vu = 0;
-    line[i - 1]->ne = creeptnoeud(i - 1);
+  creeptnoeud();
+  for (int i = 0; i < 303; i++){
+    line[i]->vu = 0;
+    line[i]->ne = t[i];
   }
   int distance = 0;
   int antecedent[303];
@@ -314,6 +379,6 @@ void Dijkstra(int Depart, int Destination){
 int main(){
   stockcsv();
   stockcsv2();
-  Dijkstra(164,82);
+  Dijkstra(12,23);
   return 0;
 }
